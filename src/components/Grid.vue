@@ -103,7 +103,8 @@ export default {
       }
     },
     checkDirection(color, cell, direction) {
-      if (cell < 0 || cell > 64) {
+      cell = Number(cell)
+      if (cell < 0 || cell > 64 || cell % 8 == 1 || cell % 8 == 0) {
         return false
       } else if (this.cells[cell] === color) {
         return cell
@@ -113,11 +114,9 @@ export default {
     },
     flipDiscs(cell, positions) {
       cell = Number(cell)
-      console.log(positions)
       if (positions.up !== -1) {
         for (var i = cell - 8; i >= (positions.up + 8); i -= 8) {
-          console.log("i: " + i + "positions.up:" + positions.up)
-          this.cells[i] = this.cells.cell
+          this.cells[i] = this.cells[cell]
           Event.$emit('flipDisc', i)
           if (i > 64 || i < 0) {
             return false
@@ -135,8 +134,7 @@ export default {
       }
       if (positions.down !== -1) {
         for (var i = cell + 8; i <= (positions.down - 8); i += 8) {
-          console.log("i: " + i + "positions.down:" + positions.down)
-          this.cells[i] = this.cells.cell
+          this.cells[i] = this.cells[cell]
           Event.$emit('flipDisc', i)
           if (i > 64 || i < 0) {
             return false
@@ -145,8 +143,7 @@ export default {
       }
       if (positions.left !== -1) {
         for (var i = cell - 1; i >= (positions.left + 1); i--) {
-          console.log("i: " + i + "positions.left:" + positions.left)
-          this.cells[i] = this.cells.cell
+          this.cells[i] = this.cells[cell]
           Event.$emit('flipDisc', i)
           if (i > 64 || i < 0) {
             return false
@@ -160,6 +157,7 @@ export default {
       Event.$emit('undo')
     },
     validateMove(cell) {
+      cell = Number(cell)
       var retBool = false
       var foundAt = false
       var indexes = {
@@ -175,8 +173,6 @@ export default {
         //cell must not be in first two rows
         if (cell > 16) {
           if (this.cells[cell] !== this.cells[cell - 8] && this.cells[cell - 8] !== "") {
-            console.log(cell + ": " + this.cells[cell])
-            console.log((cell - 8) + ": " + this.cells[cell - 8])
             foundAt = this.checkDirection(this.cells[cell], cell - 8, this.directions.up)
             if (foundAt) {
               console.log("up true")
@@ -189,8 +185,6 @@ export default {
         //cell must not be in lat two rows
         if (cell < 49) {
           if (this.cells[cell] !== this.cells[cell + 8] && this.cells[cell + 8] !== "") {
-            console.log(cell + ": " + this.cells[cell])
-            console.log((cell + 8) + ": " + this.cells[cell + 8])
             foundAt = this.checkDirection(this.cells[cell], cell + 8, this.directions.down)
             if (foundAt) {
               console.log("down true")
@@ -203,11 +197,10 @@ export default {
         //check going left
         //cell must not be in first two columns
         if (cell !== 1 && cell !== 2 && cell !== 9 && cell !== 10 && cell !== 17 && cell !== 18 && cell !== 25 && cell !== 26 && cell !== 33 && cell !== 34 && cell !== 41 && cell !== 42 && cell != 49 && cell != 50 && cell !== 57 && cell !== 58) {
-          if (this.cells[cell] !== this.cells[cell - 1] && this.cells[cell - 1] !== "") {
-            console.log(cell + ": " + this.cells[cell])
-            console.log((cell - 1) + ": " + this.cells[cell - 1])
+          if (this.cells[cell] != this.cells[cell - 1] && this.cells[cell - 1] != "") {
             foundAt = this.checkDirection(this.cells[cell], cell - 1, this.directions.left)
             if (foundAt) {
+              console.log(foundAt)
               console.log("left true")
               retBool = true
               indexes.left = foundAt
@@ -218,8 +211,6 @@ export default {
         //check going right
         if (cell !== 7 && cell !== 8 && cell !== 15 && cell !== 16 && cell !== 23 && cell !== 24 && cell !== 31 && cell !== 32 && cell !== 39 && cell !== 40 && cell !== 47 && cell !== 48 && cell != 55 && cell != 56 && cell !== 63 && cell !== 64) {
           if (this.cells[cell] !== this.cells[cell + 1] && this.cells[cell + 1] !== "") {
-            console.log(cell + ": " + this.cells[cell])
-            console.log((cell + 1) + ": " + this.cells[cell + 1])
             foundAt = this.checkDirection(this.cells[cell], cell + 1, this.directions.right)
             if (foundAt) {
               console.log("right true")
@@ -242,11 +233,11 @@ export default {
   },
   created() {
     Event.$on('placeDisc', (cell) => {
-      this.lastCells = this.cells
+    //  this.lastCells = this.cells
+      cell = Number(cell)
       this.cells[cell] = this.activePlayer
-      var positions = this.validateMove(Number(cell))
+      var positions = this.validateMove(cell)
       if (positions) {
-        console.log("Valid Move. Flipping Discs")
         this.flipDiscs(cell, positions)
         this.changePlayer()
       } else {
@@ -277,7 +268,7 @@ export default {
         17: "", 18: "", 19: "", 20: "", 21: "", 22: "", 23: "", 24: "",
         25: "", 26: "", 27: "", 28: "white", 29: "black", 30: "", 31: "",32: "",
         33: "", 34: "", 35: "", 36: "black", 37: "white", 38: "", 39: "",40: "",
-        41: "", 42: "", 43: "", 46: "", 47: "", 48: "",
+        41: "", 42: "", 43: "", 44: "", 45: "", 46: "", 47: "", 48: "",
         49: "", 50: "", 51: "", 52: "", 53: "", 54: "", 55: "", 56: "",
         57: "", 58: "", 59: "", 60: "", 61: "", 62: "", 63: "", 64: "",
       },

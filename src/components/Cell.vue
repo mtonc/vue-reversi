@@ -19,9 +19,10 @@ export default {
   methods: {
     placeDisc() {
       if (!this.frozen) {
+        // this.prepUndo()
         this.mark = this.$parent.activePlayer
         this.frozen = true
-        Event.$emit('placeDisc', this.name)
+        Event.$emit('placeDisc', Number(this.name))
       }
     },
     prepUndo() {
@@ -32,17 +33,15 @@ export default {
   created: function() {
     //if there is a default value, set the disc
     //used to set the center tile
-    if (this.defaultVal) {
+    if (this.defaultVal != undefined) {
       this.mark = this.defaultVal
       this.frozen = true
-      this.prepUndo()
+      // this.prepUndo()
     }
-
-    //Event.$on('freeze', () => this.frozen = true)
 
     //used to reset the cells at end of gaem
     Event.$on('clearCell', () => {
-      this.prepUndo()
+      // this.prepUndo()
       this.mark = ''
       this.frozen = false
     })
@@ -57,8 +56,8 @@ export default {
     })
 
     Event.$on('flipDisc', (cell) => {
+      // this.prepUndo()
       if (cell == Number(this.name)) {
-        this.prepUndo()
         if( this.mark === 'black'){
           this.mark = 'white'
         }
