@@ -82,7 +82,7 @@
       <cell name="64"></cell>
     </tr>
   </table>
-  <button type="button" class="undo-btn" @click='undo'>Undo</button>
+  <button type="button" class="newGame-btn" @click='newGame'>New Game</button>
 </div>
 </template>
 
@@ -92,15 +92,54 @@ export default {
   components: {
     Cell
   },
+  data() {
+    return {
+      activePlayer: 'black',
+      directions: {
+        'up': -8,
+        'left': -1,
+        'down': 8,
+        'right': 1
+      },
+      errorMSG: null,
+      inactivePlayer: 'white',
+      initialCells: {
+        1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "",
+        9: "", 10: "", 11: "", 12: "", 13: "", 14: "",  15: "", 16: "",
+        17: "", 18: "", 19: "", 20: "", 21: "", 22: "", 23: "", 24: "",
+        25: "", 26: "", 27: "", 28: "white", 29: "black", 30: "", 31: "",32: "",
+        33: "", 34: "", 35: "", 36: "black", 37: "white", 38: "", 39: "",40: "",
+        41: "", 42: "", 43: "", 44: "", 45: "", 46: "", 47: "", 48: "",
+        49: "", 50: "", 51: "", 52: "", 53: "", 54: "", 55: "", 56: "",
+        57: "", 58: "", 59: "", 60: "", 61: "", 62: "", 63: "", 64: "",
+      },
+      cells: {}
+    }
+  },
+  computed: {
+    blackScore() {
+      var blackCells =  Object.values(this.cells)
+      blackCells = blackCells.filter( function(value) {
+        return value == "black"
+      })
+      return blackCells.length
+    },
+    whiteScore() {
+      var whiteCells = Object.values(this.cells)
+      whiteCells = whiteCells.filter( function(value) {
+        return value == "white"
+      })
+      return whiteCells.length
+    }
+  },
   methods: {
     changePlayer() {
       if (this.activePlayer === 'white') {
         this.activePlayer = 'black'
-        this.inactivePlayer = 'white'
       } else if (this.activePlayer === 'black') {
         this.activePlayer = 'white'
-        this.inactivePlayer = 'black'
       }
+      Event.$emit('updateScoreboard', { blackScore: this.blackScore, whiteScore: this.whiteScore, currentPlayer: this.activePlayer})
     },
     checkDirection(color, cell, direction) {
       cell = Number(cell)
@@ -151,10 +190,10 @@ export default {
         }
       }
     },
-    undo() {
-      this.cells = this.lastCells
-      this.changePlayer()
-      Event.$emit('undo')
+    newGame() {
+      Event.$emit('newGame')
+      this.activePlayer = 'black'
+      this.cells = JSON.parse(JSON.stringify(this.initialCells))
     },
     validateMove(cell) {
       cell = Number(cell)
@@ -200,7 +239,6 @@ export default {
           if (this.cells[cell] != this.cells[cell - 1] && this.cells[cell - 1] != "") {
             foundAt = this.checkDirection(this.cells[cell], cell - 1, this.directions.left)
             if (foundAt) {
-              console.log(foundAt)
               console.log("left true")
               retBool = true
               indexes.left = foundAt
@@ -229,11 +267,10 @@ export default {
         return false
       }
     }
-
   },
   created() {
+    this.cells = JSON.parse(JSON.stringify(this.initialCells))
     Event.$on('placeDisc', (cell) => {
-    //  this.lastCells = this.cells
       cell = Number(cell)
       this.cells[cell] = this.activePlayer
       var positions = this.validateMove(cell)
@@ -245,75 +282,23 @@ export default {
         this.cells[cell] = ""
       }
     })
-  },
-  data() {
-    return {
-      activePlayer: 'black',
-      directions: {
-        'up': -8,
-        'left': -1,
-        'down': 8,
-        'right': 1
-      },
-      errorMSG: null,
-      inactivePlayer: 'white',
-      gameStatus: 'turn',
-      gameStatusColor: "",
-      gameStatusMessage: "O's turn",
-      lastCells: {},
-      moves: 0,
-      cells: {
-        1: "", 2: "", 3: "", 4: "", 5: "", 6: "", 7: "", 8: "",
-        9: "", 10: "", 11: "", 12: "", 13: "", 14: "",  15: "", 16: "",
-        17: "", 18: "", 19: "", 20: "", 21: "", 22: "", 23: "", 24: "",
-        25: "", 26: "", 27: "", 28: "white", 29: "black", 30: "", 31: "",32: "",
-        33: "", 34: "", 35: "", 36: "black", 37: "white", 38: "", 39: "",40: "",
-        41: "", 42: "", 43: "", 44: "", 45: "", 46: "", 47: "", 48: "",
-        49: "", 50: "", 51: "", 52: "", 53: "", 54: "", 55: "", 56: "",
-        57: "", 58: "", 59: "", 60: "", 61: "", 62: "", 63: "", 64: "",
-      },
-    }
   }
 }
 </script>
 
-<style>
+<style scoped>
 .grid {
-  background-color: #009E0B;
   color: #fff;
   max-width: 600px;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 3px;
   margin: 0 auto;
 }
 
-.gameStatus {
-  margin: 0px;
-  padding: 15px;
-  border-up-left-radius: 20px;
-  border-up-right-radius: 20px;
-  background-color: #f1c40f;
-  color: #fff;
-  font-size: 1.4em;
-  font-weight: bold;
-}
-
-.statusTurn {
-  background-color: #f1c40f;
-}
-
-.statusWin {
-  background-color: #2ecc71;
-}
-
-.statusDraw {
-  background-color: #9b59b6;
-}
-
-.undo-btn {
+.newGame-btn {
+  margin-top: 20px;
   height: 30px;
-  width: 600px;
-  border: none;
-  background-color: red;
-  color: white;
+  width: 570px;
 }
+
 </style>

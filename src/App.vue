@@ -1,15 +1,18 @@
 <template>
   <div id="app">
+    <scoreboard></scoreboard>
     <grid></grid>
   </div>
 </template>
 
 <script>
 import Grid from "./components/Grid.vue"
+import Scoreboard from "./components/Scoreboard.vue"
 export default {
   name: 'app',
   components:{
-    Grid
+    Grid,
+    Scoreboard
   },
   data () {
     return {
@@ -21,7 +24,7 @@ export default {
 
 <style lang="scss">
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -29,23 +32,5 @@ export default {
   margin-top: 60px;
   width: 80%;
   margin: 0 auto;
-}
-
-h1, h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
 }
 </style>
