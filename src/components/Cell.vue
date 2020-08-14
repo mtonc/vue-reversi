@@ -1,44 +1,53 @@
 <template>
-<div class="cell" @click="placeDisc({
-  row: row, 
-  column: column, 
-  color: activePlayer
-})">
-  <div class="circle" :class='color' v-if="color">
+  <div class="cell" @click="requestValidation">
+    <div class="circle" :class="color" v-if="color"></div>
   </div>
-</div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex"
+import { mapActions, mapGetters } from "vuex";
 
 export default {
-  props: ['color','row', 'column'],
+  props: ["color", "row", "column"],
   data() {
-    return {
-      
-    }
+    return {};
   },
   methods: {
-  ...mapActions([
-    'placeDisc'
-  ])    
-    
-  },
-  computed: {
-    isEmpty: () => {
-      if (this.color === null || this.color === undefined) {
+    ...mapActions(["placeDisc"]),
+    requestValidation: function() {
+      this.$eventBus.$emit("requestValidation", this);
+    },
+    compareCells: function(cellOne, cellTwo) {
+      if (
+        cellOne.color == cellTwo.color &&
+        cellOne.row == cellTwo.row &&
+        cellOne.column == cellTwo.column
+      ) {
         return true;
       }
       return false;
     },
+    requestListener: function() {
+      this.$eventBus.$on("requestValidated", payload => {
+        if (this.compareCells(payload, this)) {
+          this.placeDisc({
+            row: this.row,
+            column: this.column,
+            color: this.activePlayer
+          });
+        }
+      });
+    }
+  },
+  computed: {
     ...mapGetters({
       activePlayer: "getActivePlayer"
     })
   },
-  created: function() {
+  mounted: function() {
+    this.requestListener();
   }
-}
+};
 </script>
 
 <style>
@@ -52,11 +61,6 @@ export default {
 
 .cell:hover {
   background-color: #008108;
-}
-
-.cell::after {
-  content: '';
-  display: block;
 }
 
 .cell .circle {
