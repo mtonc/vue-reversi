@@ -23,8 +23,9 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    switchPlayer: ({ commmit }) => {
-      commmit("SWITCH_PLAYER");
+    switchPlayer: ({ commit }) => {
+      console.log("switching player");
+      commit("SWITCH_PLAYER");
     }
   },
   modules: {

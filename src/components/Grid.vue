@@ -35,31 +35,47 @@ export default {
     flipDiscs: function(cell, vector) {
       if (cell.color != this.activePlayer) {
         this.flipDisc({ row: cell.row, column: cell.column });
-        return this.flipDiscs(
-          this.getCell()(
-            cell.row + vector.deltaRow,
-            cell.column + vector.deltaColumn
-          ),
-          vector
-        );
+        if (this.isInBounds(cell, vector)) {
+          return this.flipDiscs(
+            this.getCell()(
+              cell.row + vector.deltaRow,
+              cell.column + vector.deltaColumn
+            ),
+            vector
+          );
+        }
+        return;
       }
       if (cell.color == this.activePlayer) {
         return;
       }
     },
+    isInBounds: function(cell, vector) {
+      if (
+        cell.row + vector.deltaRow >= 0 &&
+        cell.row + vector.deltaRow <= 7 &&
+        cell.column + vector.deltaColumn >= 0 &&
+        cell.column + vector.deltaColumn <= 7
+      ) {
+        return true;
+      }
+      return false;
+    },
     validateMove: function(cell, vector, step = 0) {
       if (step === 0) {
         if (cell.isEmpty == false && cell.color != this.activePlayer) {
-          return this.validateMove(
-            this.getCell()(
-              cell.row + vector.deltaRow,
-              cell.column + vector.deltaColumn
-            ),
-            vector,
-            ++step
-          );
+          if (this.isInBounds(cell, vector)) {
+            return this.validateMove(
+              this.getCell()(
+                cell.row + vector.deltaRow,
+                cell.column + vector.deltaColumn
+              ),
+              vector,
+              ++step
+            );
+          }
+          return false;
         } else {
-          console.log("stop step 0");
           return false;
         }
       }
@@ -87,17 +103,7 @@ export default {
     ...mapGetters({
       board: "getBoard",
       activePlayer: "getActivePlayer"
-    }),
-    isInBounds: function(cell, vector) {
-      if (
-        (cell.row + vector.deltaRow >= 0 || cell.row + vector.deltaRow <= 7) &&
-        (cell.column + vector.deltaColumn >= 0 ||
-          cell.column + vector.deltaColumn <= 7)
-      ) {
-        return true;
-      }
-      return false;
-    }
+    })
   },
   data() {
     return {
@@ -126,28 +132,33 @@ export default {
   created: function() {
     this.$eventBus.$on("requestValidation", payload => {
       for (const [key, dir] of Object.entries(this.vectors)) {
-        this.vectorResults[key] = this.validateMove(
-          this.getCell()(
-            payload.row + dir.deltaRow,
-            payload.column + dir.deltaColumn
-          ),
-          dir
-        );
+        if (this.isInBounds(payload, dir)) {
+          this.vectorResults[key] = this.validateMove(
+            this.getCell()(
+              payload.row + dir.deltaRow,
+              payload.column + dir.deltaColumn
+            ),
+            dir
+          );
+        }
       }
       if (Object.values(this.vectorResults).includes(true)) {
         this.$eventBus.$emit("requestValidated", payload);
-        for (const [key , value] of Object.entries(this.vectorResults)) {
+        for (const [key, value] of Object.entries(this.vectorResults)) {
           if (value) {
             const vector = this.vectors[key];
-            this.flipDiscs(
-              this.getCell()(
-                payload.row + vector.deltaRow,
-                payload.column + vector.deltaColumn
-              ),
-              vector
-            );
+            if (this.isInBounds(payload, vector)) {
+              this.flipDiscs(
+                this.getCell()(
+                  payload.row + vector.deltaRow,
+                  payload.column + vector.deltaColumn
+                ),
+                vector
+              );
+            }
           }
         }
+        this.switchPlayer();
       }
     });
   }

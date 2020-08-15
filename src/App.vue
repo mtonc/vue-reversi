@@ -1,18 +1,18 @@
 <template>
   <div id="app">
-    <ActivePlayer />
+    <Scoreboard />
     <Grid />
   </div>
 </template>
 
 <script>
 import Grid from "./components/Grid.vue";
-import ActivePlayer from "./components/ActivePlayer.vue";
+import Scoreboard from "./components/Scoreboard.vue";
 
 export default {
   name: "App",
   components: {
-    ActivePlayer,
+    Scoreboard,
     Grid
   }
 };

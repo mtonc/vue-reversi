@@ -414,6 +414,12 @@ export default {
     },
     getCell: state => (row, column) => {
       return state.board[row][column];
+    },
+    getScore: state => color => {
+      return state.board.reduce((score, row) => {
+        const circles = row.filter(elem => elem.color == color);
+        return score + circles.length;
+      }, 0);
     }
   },
   mutations: {
@@ -434,7 +440,7 @@ export default {
       commit("PLACE_DISC", payload);
     },
     flipDisc: ({ commit }, payload) => {
-      commit("FLIP_DISC", payload)
+      commit("FLIP_DISC", payload);
     }
   }
 };
